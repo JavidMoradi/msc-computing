@@ -121,6 +121,10 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <HeapCommitSize>8000000</HeapCommitSize>
+      <StackCommitSize>8000000</StackCommitSize>
+      <HeapReserveSize>8000000</HeapReserveSize>
+      <StackReserveSize>8000000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
