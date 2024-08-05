@@ -301,19 +301,10 @@ void threepivotSortAltPivotTest(std::vector<int>& arr, int size) {
 int main()
 {
 	// Input arrays
-	const int size = 5000;
+	const int size = 1e7;
 
 	std::vector<int> arr1(size);
 	fillArrayWithRandomIntegers(arr1, size, 0, INT_MAX);
-	
-	//std::vector<int> arr2(arr1);
-	//std::vector<int> arr3(arr1);
-	//std::vector<int> arr4(arr1);
-	//std::vector<int> arr5(arr1);
-	//std::vector<int> arr6(arr1);
-
-	//std::vector<int> arrM(arr1);
-	//std::vector<int> arrR(arr1);
 
 	bool shouldSort = false;
 	bool isReversed = false;
