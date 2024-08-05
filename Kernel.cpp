@@ -106,7 +106,7 @@ void simpleStreamTest(int size) {
 int main()
 {
 	// Input arrays
-	const int size = 21;
+	const int size = 10000;
 
 	std::vector<int> arr1(size);
 	fillArrayWithRandomIntegers(arr1, size, 0, INT_MAX);
