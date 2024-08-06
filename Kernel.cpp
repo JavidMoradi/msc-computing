@@ -301,13 +301,13 @@ void threepivotSortAltPivotTest(std::vector<int>& arr, int size) {
 int main()
 {
 	// Input arrays
-	const int size = 1e6;
+	const int size = 1e7;
 
 	std::vector<int> arr1(size);
 	fillArrayWithRandomIntegers(arr1, size, 0, INT_MAX);
 
-	bool shouldSort = false;
-	bool isReversed = false;
+	bool shouldSort = true;
+	bool isReversed = true;
 
 	if (shouldSort)
 		sortVector(arr1);
@@ -317,32 +317,32 @@ int main()
 	// Regular Quicksort
 	//quicksortTest(arr1, size);
 
-	//// Mergesort
-	//mergesortTest(arr1, size);
+	// Mergesort
+	mergesortTest(arr1, size);
 
-	//// Radixsort
-	//radixsortTest(arr1, size);
+	// Radixsort
+	radixsortTest(arr1, size);
 
-	//// Three-pivot Quicksort
-	//threepivotQuicksortTest(arr1, size);
+	// Three-pivot Quicksort
+	threepivotQuicksortTest(arr1, size);
 
-	//// Naive multi-threaded Three-pivot Quicksort
-	//naiveMultiThreadSortTest(arr1, size);
+	// Naive multi-threaded Three-pivot Quicksort
+	naiveMultiThreadSortTest(arr1, size);
 
-	//// Naive multi-threaded Three-pivot Quicksort (test for various k values)
-	////naiveMultiThreadSortTestForK(size);
+	// Naive multi-threaded Three-pivot Quicksort (test for various k values)
+	//naiveMultiThreadSortTestForK(size);
 
-	//// Data Stream Test
-	////simpleStreamTest(size);
+	// Data Stream Test
+	//simpleStreamTest(size);
 
-	//// Parallel TP Quicksort
+	// Parallel TP Quicksort
 	parallelThreepivotSortTest(arr1, size);
 
-	//// TP Quicksort with Cache
-	//threepivotSortWithCacheTest(arr1, size);
+	// TP Quicksort with Cache
+	threepivotSortWithCacheTest(arr1, size);
 
-	//// TP Quicksort with Alternative Pivot Choice
-	//threepivotSortAltPivotTest(arr1, size);
+	// TP Quicksort with Alternative Pivot Choice
+	threepivotSortAltPivotTest(arr1, size);
 
 	return 0;
 }
