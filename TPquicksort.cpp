@@ -335,105 +335,133 @@ void TPquicksort::parallelKthPartition(std::vector<int>& seq, int last,
 
 	int count1 = 0, count2 = 0, count3 = 0, count4 = 0;
 
-	TPquicksort tp;
-	int firstInd = 0;
+	//TPquicksort tp;
+	//int firstInd = 0;
 
-	std::thread t1 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-		&count1, &count2, &count3, &count4, firstInd, kTh1]()
-		{
-			for (int i = 0; i <= kTh1; i++) {
-				int element = seq[i];
+	//std::thread t1 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
+	//	&count1, &count2, &count3, &count4, firstInd, kTh1]()
+	//	{
+	//		for (int i = 0; i <= kTh1; i++) {
+	//			int element = seq[i];
 
-				if (element <= split1) {
-					bucket1.push_back(element);
-					count1++;
-				}
-				else if (split1 < element && element <= split2) {
-					bucket2.push_back(element);
-					count2++;
-				}
-				else if (split2 < element && element <= split3) {
-					bucket3.push_back(element);
-					count3++;
-				}
-				else {
-					bucket4.push_back(element);
-					count4++;
-				}
+	//			if (element <= split1) {
+	//				bucket1.push_back(element);
+	//				count1++;
+	//			}
+	//			else if (split1 < element && element <= split2) {
+	//				bucket2.push_back(element);
+	//				count2++;
+	//			}
+	//			else if (split2 < element && element <= split3) {
+	//				bucket3.push_back(element);
+	//				count3++;
+	//			}
+	//			else {
+	//				bucket4.push_back(element);
+	//				count4++;
+	//			}
+	//		}
+	//	});
+	//std::thread t2 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
+	//	&count1, &count2, &count3, &count4, kTh1, kTh2]()
+	//	{
+	//		for (int i = kTh1 + 1; i <= kTh2; i++) {
+	//			int element = seq[i];
+
+	//			if (element <= split1) {
+	//				bucket1.push_back(element);
+	//				count1++;
+	//			}
+	//			else if (split1 < element && element <= split2) {
+	//				bucket2.push_back(element);
+	//				count2++;
+	//			}
+	//			else if (split2 < element && element <= split3) {
+	//				bucket3.push_back(element);
+	//				count3++;
+	//			}
+	//			else {
+	//				bucket4.push_back(element);
+	//				count4++;
+	//			}
+	//		}
+	//	});
+	//std::thread t3 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
+	//	&count1, &count2, &count3, &count4, kTh2, kTh3]()
+	//	{
+	//		for (int i = kTh2 + 1; i <= kTh3; i++) {
+	//			int element = seq[i];
+
+	//			if (element <= split1) {
+	//				bucket1.push_back(element);
+	//				count1++;
+	//			}
+	//			else if (split1 < element && element <= split2) {
+	//				bucket2.push_back(element);
+	//				count2++;
+	//			}
+	//			else if (split2 < element && element <= split3) {
+	//				bucket3.push_back(element);
+	//				count3++;
+	//			}
+	//			else {
+	//				bucket4.push_back(element);
+	//				count4++;
+	//			}
+	//		}
+	//	});
+	//std::thread t4 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
+	//	&count1, &count2, &count3, &count4, kTh3, last]()
+	//	{
+	//		for (int i = kTh3 + 1; i <= last; i++) {
+	//			int element = seq[i];
+
+	//			if (element <= split1) {
+	//				bucket1.push_back(element);
+	//				count1++;
+	//			}
+	//			else if (split1 < element && element <= split2) {
+	//				bucket2.push_back(element);
+	//				count2++;
+	//			}
+	//			else if (split2 < element && element <= split3) {
+	//				bucket3.push_back(element);
+	//				count3++;
+	//			}
+	//			else {
+	//				bucket4.push_back(element);
+	//				count4++;
+	//			}
+	//		}
+	//	});
+
+	auto partition = [&](int start, int end) {
+		for (int i = start; i <= end; i++) {
+			int element = seq[i];
+			std::lock_guard<std::mutex> lock(mtx);
+			if (element <= split1) {
+				bucket1.push_back(element);
+				count1++;
 			}
-		});
-	std::thread t2 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-		&count1, &count2, &count3, &count4, kTh1, kTh2]()
-		{
-			for (int i = kTh1 + 1; i <= kTh2; i++) {
-				int element = seq[i];
-
-				if (element <= split1) {
-					bucket1.push_back(element);
-					count1++;
-				}
-				else if (split1 < element && element <= split2) {
-					bucket2.push_back(element);
-					count2++;
-				}
-				else if (split2 < element && element <= split3) {
-					bucket3.push_back(element);
-					count3++;
-				}
-				else {
-					bucket4.push_back(element);
-					count4++;
-				}
+			else if (element <= split2) {
+				bucket2.push_back(element);
+				count2++;
 			}
-		});
-	std::thread t3 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-		&count1, &count2, &count3, &count4, kTh2, kTh3]()
-		{
-			for (int i = kTh2 + 1; i <= kTh3; i++) {
-				int element = seq[i];
-
-				if (element <= split1) {
-					bucket1.push_back(element);
-					count1++;
-				}
-				else if (split1 < element && element <= split2) {
-					bucket2.push_back(element);
-					count2++;
-				}
-				else if (split2 < element && element <= split3) {
-					bucket3.push_back(element);
-					count3++;
-				}
-				else {
-					bucket4.push_back(element);
-					count4++;
-				}
+			else if (element <= split3) {
+				bucket3.push_back(element);
+				count3++;
 			}
-		});
-	std::thread t4 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-		&count1, &count2, &count3, &count4, kTh3, last]()
-		{
-			for (int i = kTh3 + 1; i <= last; i++) {
-				int element = seq[i];
-
-				if (element <= split1) {
-					bucket1.push_back(element);
-					count1++;
-				}
-				else if (split1 < element && element <= split2) {
-					bucket2.push_back(element);
-					count2++;
-				}
-				else if (split2 < element && element <= split3) {
-					bucket3.push_back(element);
-					count3++;
-				}
-				else {
-					bucket4.push_back(element);
-					count4++;
-				}
+			else {
+				bucket4.push_back(element);
+				count4++;
 			}
-		});
+		}
+		};
+
+	std::thread t1(partition, 0, kTh1);
+	std::thread t2(partition, kTh1 + 1, kTh2);
+	std::thread t3(partition, kTh2 + 1, kTh3);
+	std::thread t4(partition, kTh3 + 1, last);
 
 	t1.join();
 	t2.join();

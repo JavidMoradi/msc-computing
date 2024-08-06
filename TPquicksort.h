@@ -4,6 +4,8 @@
 #include <vector>
 #include <cmath>
 #include <random>
+#include <thread>
+#include <mutex>
 
 struct Cache {
 	int a;
@@ -33,4 +35,5 @@ public:
 
 private:
 	const int INSERTION_SORT_THRESHOLD = 10;
+	std::mutex mtx;
 };
