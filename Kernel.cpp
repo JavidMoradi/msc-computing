@@ -513,6 +513,44 @@ long long shiftsortTest(std::vector<int>& arr, int size) {
 	return duration.count();
 }
 
+void threepivotQuicksortTestStr(std::vector<std::string>& arr, int size) {
+	TPquicksortStr tps;
+
+	std::cout << "Three-pivot Quicksort (String)" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tps.threePivotSortStr(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	printDashLines();
+}
+
+void quicksortTestStr(std::vector<std::string>& arr, int size) {
+	TPquicksortStr tps;
+
+	std::cout << "Quicksort (String)" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tps.quicksortStr(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	printDashLines();
+}
+
 int main()
 {
 	// Input arrays
@@ -521,8 +559,10 @@ int main()
 	std::vector<int> arr1(size);
 	fillArrayWithRandomIntegers(arr1, size, 0, INT_MAX);
 
-	bool shouldSort = true;
-	bool isReversed = true;
+	std::vector<int> _arr1 = arr1;
+
+	bool shouldSort = false;
+	bool isReversed = false;
 
 	if (shouldSort)
 		sortVector(arr1);
@@ -641,6 +681,31 @@ int main()
 
 	// Insertion Sort Threshold Test
 	threepivotQuicksortWithDifferentInsertionSortThresholdTest(arr1, size);
+
+	// String Sortings
+	int sizeStr = 20;
+	int length = 5;
+	std::vector<std::string> arr2;
+
+	fillArrayWithRandomStrings(arr2, sizeStr, length);
+
+	bool shouldSortStr = false;
+	bool shouldReverseStr = false;
+
+	if (shouldSortStr) {
+		TPquicksortStr tps;
+		tps.quicksortStr(arr2, 0, sizeStr - 1);
+	}
+	if (shouldReverseStr) {
+		std::reverse(arr2.begin(), arr2.end());
+	}
+	
+	std::vector<std::string> _arr2 = arr2;
+
+	quicksortTestStr(arr2, sizeStr);
+	
+	arr2 = _arr2;
+	threepivotQuicksortTestStr(arr2, sizeStr);
 
 	return 0;
 }
