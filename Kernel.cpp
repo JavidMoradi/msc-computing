@@ -9,6 +9,25 @@
 #include "TPquicksort.h"
 #include "Mergesort.h"
 #include "Radixsort.h"
+#include "TPquicksortStr.h"
+
+std::string generateRandomString(int length) {
+	const std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	std::string randomString;
+	for (int i = 0; i < length; ++i) {
+		randomString += characters[std::rand() % characters.size()];
+	}
+	return randomString;
+}
+
+void fillArrayWithRandomStrings(std::vector<std::string>& array, int size, int stringLength) {
+	std::srand(static_cast<unsigned>(std::time(nullptr)));
+
+	array.resize(size); // Resize the vector to the desired size
+	for (int i = 0; i < size; ++i) {
+		array[i] = generateRandomString(stringLength);
+	}
+}
 
 void fillArrayWithRandomIntegers(std::vector<int>& array, int size, int min, int max)
 {
@@ -38,6 +57,17 @@ std::string isArraySorted(std::vector<int> arr, int size)
 	return "true";
 }
 
+std::string isArraySortedStr(const std::vector<std::string>& arr, int size)
+{
+	for (int i = 0; i < size - 1; ++i) {
+		if (arr[i] > arr[i + 1]) {
+			std::cout << "Occurred here: " << arr[i] << ", " << arr[i + 1] << std::endl;
+			return "false";
+		}
+	}
+	return "true";
+}
+
 void printDashLines() {
 	std::cout << "----------------------------" << std::endl;
 }
@@ -50,15 +80,15 @@ void reverseVector(std::vector<int>& vector) {
 	std::reverse(vector.begin(), vector.end());
 }
 
-void printMemoryUsage() {
-	PROCESS_MEMORY_COUNTERS pmc;
-	if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-		std::cout << "Memory usage: " << pmc.WorkingSetSize / 1024 << " KB" << std::endl;
-	}
-	else {
-		std::cerr << "Failed to retrieve memory usage" << std::endl;
-	}
-}
+//void printMemoryUsage() {
+//	PROCESS_MEMORY_COUNTERS pmc;
+//	if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
+//		std::cout << "Memory usage: " << pmc.WorkingSetSize / 1024 << " KB" << std::endl;
+//	}
+//	else {
+//		std::cerr << "Failed to retrieve memory usage" << std::endl;
+//	}
+//}
 
 void simpleStreamTest(int size) {
 	std::vector<int> original(size);
@@ -298,6 +328,44 @@ void threepivotSortAltPivotTest(std::vector<int>& arr, int size) {
 	printDashLines();
 }
 
+void threepivotQuicksortTestStr(std::vector<std::string>& arr, int size) {
+	TPquicksortStr tps;
+
+	std::cout << "Three-pivot Quicksort (String)" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tps.threePivotSortStr(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	printDashLines();
+}
+
+void quicksortTestStr(std::vector<std::string>& arr, int size) {
+	TPquicksortStr tps;
+
+	std::cout << "Quicksort (String)" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tps.quicksortStr(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	printDashLines();
+}
+
 int main()
 {
 	// Input arrays
@@ -306,8 +374,10 @@ int main()
 	std::vector<int> arr1(size);
 	fillArrayWithRandomIntegers(arr1, size, 0, INT_MAX);
 
-	bool shouldSort = true;
-	bool isReversed = true;
+	std::vector<int> _arr1 = arr1;
+
+	bool shouldSort = false;
+	bool isReversed = false;
 
 	if (shouldSort)
 		sortVector(arr1);
@@ -318,15 +388,19 @@ int main()
 	//quicksortTest(arr1, size);
 
 	// Mergesort
+	arr1 = _arr1;
 	mergesortTest(arr1, size);
 
 	// Radixsort
+	arr1 = _arr1;
 	radixsortTest(arr1, size);
 
 	// Three-pivot Quicksort
+	arr1 = _arr1;
 	threepivotQuicksortTest(arr1, size);
 
 	// Naive multi-threaded Three-pivot Quicksort
+	arr1 = _arr1;
 	naiveMultiThreadSortTest(arr1, size);
 
 	// Naive multi-threaded Three-pivot Quicksort (test for various k values)
@@ -336,13 +410,41 @@ int main()
 	//simpleStreamTest(size);
 
 	// Parallel TP Quicksort
+	arr1 = _arr1;
 	parallelThreepivotSortTest(arr1, size);
 
 	// TP Quicksort with Cache
+	arr1 = _arr1;
 	threepivotSortWithCacheTest(arr1, size);
 
 	// TP Quicksort with Alternative Pivot Choice
+	arr1 = _arr1;
 	threepivotSortAltPivotTest(arr1, size);
+
+	// String Sortings
+	int sizeStr = 20;
+	int length = 5;
+	std::vector<std::string> arr2;
+
+	fillArrayWithRandomStrings(arr2, sizeStr, length);
+
+	bool shouldSortStr = false;
+	bool shouldReverseStr = false;
+
+	if (shouldSortStr) {
+		TPquicksortStr tps;
+		tps.quicksortStr(arr2, 0, sizeStr - 1);
+	}
+	if (shouldReverseStr) {
+		std::reverse(arr2.begin(), arr2.end());
+	}
+	
+	std::vector<std::string> _arr2 = arr2;
+
+	quicksortTestStr(arr2, sizeStr);
+	
+	arr2 = _arr2;
+	threepivotQuicksortTestStr(arr2, sizeStr);
 
 	return 0;
 }
