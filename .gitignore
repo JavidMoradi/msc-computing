@@ -4,3 +4,7 @@
 
 /.vs/ThreePivotQS
 /x64/Debug
+ThreePivotQS.sln
+ThreePivotQS.vcxproj
+ThreePivotQS.vcxproj.filters
+ThreePivotQS.vcxproj.user

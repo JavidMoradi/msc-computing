@@ -6,6 +6,7 @@
 #include <random>
 #include <thread>
 #include <mutex>
+#include <memory>
 
 struct Cache {
 	int a;
@@ -27,6 +28,10 @@ public:
 		int kTh1, int kTh2, int kTh3, int kTh4);
 	void threePivotSortWithCache(std::vector<int>& A, int left, int right);
 	void threePivotSortAltPvt(std::vector<int>& A, int left, int right);
+	void threePivotSort(std::vector<int>& A, int left, int right, int insertionSortThreshold);
+	void threePivotSortWithCacheHeap(std::vector<int>& A, int left, int right);
+	void threePivotSortWithCacheArray(std::vector<int>& A, int left, int right);
+	void threePivotSortWithCacheArrayHeap(std::vector<int>& A, int left, int right);
 
 	// Utility functions
 	void insertionSort(std::vector<int>& arr, int start, int end);

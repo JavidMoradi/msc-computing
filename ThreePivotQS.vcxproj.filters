@@ -30,6 +30,12 @@
     <ClCompile Include="Radixsort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TPquicksortStr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shiftsort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Quicksort.h">
@@ -42,6 +48,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Radixsort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TPquicksortStr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shiftsort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

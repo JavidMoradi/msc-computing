@@ -23,13 +23,17 @@
     <ClCompile Include="Mergesort.cpp" />
     <ClCompile Include="Quicksort.cpp" />
     <ClCompile Include="Radixsort.cpp" />
+    <ClCompile Include="Shiftsort.cpp" />
     <ClCompile Include="TPquicksort.cpp" />
+    <ClCompile Include="TPquicksortStr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mergesort.h" />
     <ClInclude Include="Quicksort.h" />
     <ClInclude Include="Radixsort.h" />
+    <ClInclude Include="Shiftsort.h" />
     <ClInclude Include="TPquicksort.h" />
+    <ClInclude Include="TPquicksortStr.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
