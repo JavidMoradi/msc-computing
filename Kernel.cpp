@@ -10,6 +10,7 @@
 #include "Mergesort.h"
 #include "Radixsort.h"
 #include "TPquicksortStr.h"
+#include "Shiftsort.h"
 
 std::string generateRandomString(int length) {
 	const std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -80,60 +81,63 @@ void reverseVector(std::vector<int>& vector) {
 	std::reverse(vector.begin(), vector.end());
 }
 
-//void printMemoryUsage() {
-//	PROCESS_MEMORY_COUNTERS pmc;
-//	if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-//		std::cout << "Memory usage: " << pmc.WorkingSetSize / 1024 << " KB" << std::endl;
-//	}
-//	else {
-//		std::cerr << "Failed to retrieve memory usage" << std::endl;
-//	}
-//}
-
 void simpleStreamTest(int size) {
-	std::vector<int> original(size);
-	fillArrayWithRandomIntegers(original, original.size(), 0, INT_MAX);
+	const int ITERATION = 5;
+	int duration1 = 0;
+	int duration2 = 0;
 
-	std::vector<int> copy = original;
-	std::sort(copy.begin(), copy.end());
-	std::swap(copy[copy.size() - 1], copy[copy.size() - 2]);
+	for (int i = 0; i < ITERATION; i++) {
+		std::vector<int> original(size);
+		fillArrayWithRandomIntegers(original, original.size(), 0, INT_MAX);
 
-	// Sorting original
-	int originalSize = original.size();
+		std::vector<int> copy = original;
+		std::sort(copy.begin(), copy.end());
+		std::swap(copy[copy.size() - 1], copy[copy.size() - 2]);
 
-	TPquicksort tp;
+		// Sorting original
+		int originalSize = original.size();
 
-	auto start = std::chrono::high_resolution_clock::now();
+		TPquicksort tp;
 
-	tp.threePivotSort(original, 0, originalSize - 1);
+		auto start = std::chrono::high_resolution_clock::now();
 
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		tp.threePivotSort(original, 0, originalSize - 1);
 
-	std::cout << std::endl;
-	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
-	std::cout << std::endl;
+		auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 
-	std::cout << "Is array sorted? " << isArraySorted(original, original.size()) << std::endl;
+		std::cout << std::endl;
+		std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+		std::cout << std::endl;
 
-	// Sorting copy
-	int copySize = copy.size();
+		std::cout << "Is array sorted? " << isArraySorted(original, original.size()) << std::endl;
 
-	start = std::chrono::high_resolution_clock::now();
+		duration1 += duration.count();
 
-	tp.threePivotSort(copy, 0, copySize - 1);
+		// Sorting copy
+		int copySize = copy.size();
 
-	end = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		start = std::chrono::high_resolution_clock::now();
 
-	std::cout << std::endl;
-	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
-	std::cout << std::endl;
+		tp.threePivotSort(copy, 0, copySize - 1);
 
-	std::cout << "Is array sorted? " << isArraySorted(original, copy.size()) << std::endl;
+		end = std::chrono::high_resolution_clock::now();
+		duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+		std::cout << std::endl;
+		std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+		std::cout << std::endl;
+
+		std::cout << "Is array sorted? " << isArraySorted(original, copy.size()) << std::endl;
+
+		duration2 += duration.count();
+	}
+	
+	std::cout << "Random Duration 1: " << duration1 << std::endl;
+	std::cout << "Stream Duration 2: " << duration2 << std::endl;
 }
 
-void quicksortTest(std::vector<int>& arr, int size) {
+long long quicksortTest(std::vector<int>& arr, int size) {
 	Quicksort qs;
 
 	std::cout << "Regular Quicksort" << std::endl;
@@ -152,9 +156,11 @@ void quicksortTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+
+	return duration.count();
 }
 
-void mergesortTest(std::vector<int>& arr, int size) {
+long long mergesortTest(std::vector<int>& arr, int size) {
 	Mergesort ms;
 
 	std::cout << "Regular Mergesort" << std::endl;
@@ -173,9 +179,11 @@ void mergesortTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+
+	return duration.count();
 }
 
-void radixsortTest(std::vector<int>& arr, int size) {
+long long radixsortTest(std::vector<int>& arr, int size) {
 	Radixsort rs;
 
 	std::cout << "Regular Radixsort" << std::endl;
@@ -194,9 +202,11 @@ void radixsortTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+
+	return duration.count();
 }
 
-void threepivotQuicksortTest(std::vector<int>& arr, int size) {
+long long threepivotQuicksortTest(std::vector<int>& arr, int size) {
 	TPquicksort tp;
 
 	std::cout << "Three-pivot Quicksort" << std::endl;
@@ -215,9 +225,11 @@ void threepivotQuicksortTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+
+	return duration.count();
 }
 
-void naiveMultiThreadSortTest(std::vector<int>& arr, int size) {
+long long naiveMultiThreadSortTest(std::vector<int>& arr, int size) {
 	TPquicksort tp;
 
 	std::cout << "Naive multi-threaded Three-pivot Quicksort" << std::endl;
@@ -236,6 +248,8 @@ void naiveMultiThreadSortTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+	
+	return duration.count();
 }
 
 void naiveMultiThreadSortTestForK(int size) {
@@ -265,7 +279,7 @@ void naiveMultiThreadSortTestForK(int size) {
 	}
 }
 
-void parallelThreepivotSortTest(std::vector<int>& arr, int size) {
+long long parallelThreepivotSortTest(std::vector<int>& arr, int size) {
 	TPquicksort tp;
 
 	std::cout << "Parallel Three-pivot Quicksort" << std::endl;
@@ -284,9 +298,11 @@ void parallelThreepivotSortTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+
+	return duration.count();
 }
 
-void threepivotSortWithCacheTest(std::vector<int>& arr, int size) {
+long long threepivotSortWithCacheTest(std::vector<int>& arr, int size) {
 	TPquicksort tp;
 
 	std::cout << "Three-pivot Quicksort with Cache" << std::endl;
@@ -305,9 +321,11 @@ void threepivotSortWithCacheTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+
+	return duration.count();
 }
 
-void threepivotSortAltPivotTest(std::vector<int>& arr, int size) {
+long long threepivotSortAltPivotTest(std::vector<int>& arr, int size) {
 	TPquicksort tp;
 
 	std::cout << "Three-pivot Quicksort with Alternative Pivot Choice" << std::endl;
@@ -326,6 +344,173 @@ void threepivotSortAltPivotTest(std::vector<int>& arr, int size) {
 	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
 
 	printDashLines();
+
+	return duration.count();
+}
+
+long long threepivotQuicksortTestStr(std::vector<std::string>& arr, int size) {
+	TPquicksortStr tps;
+
+	std::cout << "Three-pivot Quicksort (String)" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tps.threePivotSortStr(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	printDashLines();
+
+	return duration.count();
+}
+
+long long quicksortTestStr(std::vector<std::string>& arr, int size) {
+	TPquicksortStr tps;
+
+	std::cout << "Quicksort (String)" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tps.quicksortStr(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	printDashLines();
+
+	return duration.count();
+}
+
+void threepivotQuicksortWithDifferentInsertionSortThresholdTest(std::vector<int>& arr, int size) {
+	TPquicksort tp;
+
+	std::cout << "Three-pivot Quicksort with Varying Insertion Sort Threshold Value" << std::endl;
+
+	std::vector<int> _arr = arr;
+	const int ITERATION_COUNT = 5;
+
+	for (int i = 5; i <= 100; i++) {
+		auto sum = 0;
+		for (int j = 0; j < ITERATION_COUNT; j++) {
+			arr = _arr;
+
+			auto start = std::chrono::high_resolution_clock::now();
+
+			tp.threePivotSort(arr, 0, size - 1, i);
+
+			auto end = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+			//std::cout << std::endl;
+			//std::cout << "THRESHOLD VALUE: " << i << ", Time Taken: " << duration.count() << " microseconds" << std::endl;
+			//std::cout << std::endl;
+			sum += duration.count();
+		}
+		std::cout << "THRESHOLD VALUE: " << i << ", Avg Time Taken: " << sum / ITERATION_COUNT << " microseconds" << std::endl;
+	}
+
+	printDashLines();
+}
+
+long long threepivotSortWithCacheHeapTest(std::vector<int>& arr, int size) {
+	TPquicksort tp;
+
+	std::cout << "Three-pivot Quicksort with Cache Heap" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tp.threePivotSortWithCacheHeap(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
+
+	printDashLines();
+
+	return duration.count();
+}
+
+long long threepivotSortWithCacheArrayTest(std::vector<int>& arr, int size) {
+	TPquicksort tp;
+
+	std::cout << "Three-pivot Quicksort with Cache Array" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tp.threePivotSortWithCacheArray(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
+
+	printDashLines();
+
+	return duration.count();
+}
+
+long long threepivotSortWithCacheArrayHeapTest(std::vector<int>& arr, int size) {
+	TPquicksort tp;
+
+	std::cout << "Three-pivot Quicksort with Cache Array Heap" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	tp.threePivotSortWithCacheArrayHeap(arr, 0, size - 1);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
+
+	printDashLines();
+
+	return duration.count();
+}
+
+long long shiftsortTest(std::vector<int>& arr, int size) {
+	Shiftsort ss;
+
+	std::cout << "Shift Sort" << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	ss.sort(arr, size);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+	std::cout << std::endl;
+	std::cout << "Time taken: " << duration.count() << " microseconds" << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "Is array sorted? " << isArraySorted(arr, size) << std::endl;
+
+	printDashLines();
+
+	return duration.count();
 }
 
 void threepivotQuicksortTestStr(std::vector<std::string>& arr, int size) {
@@ -384,42 +569,118 @@ int main()
 	if (isReversed)
 		reverseVector(arr1);
 
-	// Regular Quicksort
-	//quicksortTest(arr1, size);
+	std::vector<int> _arr1 = arr1;
 
-	// Mergesort
-	arr1 = _arr1;
-	mergesortTest(arr1, size);
+	int iteration = 5;
+	auto sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0, sum5 = 0, sum6 = 0, sum7 = 0, sum8 = 0, sum9 = 0, sum10 = 0, sum11 = 0, sum12 = 0;
 
-	// Radixsort
-	arr1 = _arr1;
-	radixsortTest(arr1, size);
+	for (int i = 0; i < iteration; i++) {
+		// Regular Quicksort
+		arr1 = _arr1;
+		sum1 += quicksortTest(arr1, size);
 
-	// Three-pivot Quicksort
-	arr1 = _arr1;
-	threepivotQuicksortTest(arr1, size);
+		// Mergesort
+		arr1 = _arr1;
+		sum2 += mergesortTest(arr1, size);
 
-	// Naive multi-threaded Three-pivot Quicksort
-	arr1 = _arr1;
-	naiveMultiThreadSortTest(arr1, size);
+		// Radixsort
+		arr1 = _arr1;
+		sum3 += radixsortTest(arr1, size);
 
-	// Naive multi-threaded Three-pivot Quicksort (test for various k values)
-	//naiveMultiThreadSortTestForK(size);
+		// Three-pivot Quicksort
+		arr1 = _arr1;
+		sum4 += threepivotQuicksortTest(arr1, size);
+
+		// Naive multi-threaded Three-pivot Quicksort
+		arr1 = _arr1;
+		sum5 += naiveMultiThreadSortTest(arr1, size);
+
+		// Naive multi-threaded Three-pivot Quicksort (test for various k values)
+		// naiveMultiThreadSortTestForK(size);
+
+		// Data Stream Test
+		//simpleStreamTest(size);
+
+		// Parallel TP Quicksort
+		arr1 = _arr1;
+		sum6 += parallelThreepivotSortTest(arr1, size);
+
+		// TP Quicksort with Cache
+		arr1 = _arr1;
+		sum7 += threepivotSortWithCacheTest(arr1, size);
+
+		// TP Quicksort with Alternative Pivot Choice
+		arr1 = _arr1;
+		sum8 += threepivotSortAltPivotTest(arr1, size);
+
+		// TP Quicksort with Cache Heap
+		arr1 = _arr1;
+		sum9 += threepivotSortWithCacheHeapTest(arr1, size);
+
+		// TP Quicksort with Cache Array
+		arr1 = _arr1;
+		sum10 += threepivotSortWithCacheArrayTest(arr1, size);
+
+		// TP Quicksort with Cache Array Heap
+		arr1 = _arr1;
+		sum11 += threepivotSortWithCacheArrayHeapTest(arr1, size);
+
+		// Shift sort
+		arr1 = _arr1;
+		sum12 += shiftsortTest(arr1, size);
+	}
+	std::cout << "Quicksort: "		<< sum1 / iteration << std::endl;
+	std::cout << "TP quicksort: "	<< sum4 / iteration << std::endl;
+	std::cout << "Naive MT: "		<< sum5 / iteration << std::endl;
+	std::cout << "Parallel MT: "	<< sum6 / iteration << std::endl;
+	std::cout << "Cache TP: "		<< sum7 / iteration << std::endl;
+	std::cout << "Alt pivot: "		<< sum8 / iteration << std::endl;
+	std::cout << "Mergesort: "		<< sum2 / iteration << std::endl;
+	std::cout << "Radixsort: "		<< sum3 / iteration << std::endl;
+	std::cout << "Cache Heap TP: "	<< sum9 / iteration << std::endl;
+	std::cout << "Cache Array TP: " << sum10 / iteration << std::endl;
+	std::cout << "Cache Arr H TP: " << sum11 / iteration << std::endl;
+	std::cout << "Shift sort: " 	<< sum12 / iteration << std::endl;
 
 	// Data Stream Test
-	//simpleStreamTest(size);
+	simpleStreamTest(size);
 
-	// Parallel TP Quicksort
-	arr1 = _arr1;
-	parallelThreepivotSortTest(arr1, size);
+	// String Sortings
+	int sizeStr = 1e7;
+	int length = 5;
+	std::vector<std::string> arr2;
 
-	// TP Quicksort with Cache
-	arr1 = _arr1;
-	threepivotSortWithCacheTest(arr1, size);
+	fillArrayWithRandomStrings(arr2, sizeStr, length);
 
-	// TP Quicksort with Alternative Pivot Choice
-	arr1 = _arr1;
-	threepivotSortAltPivotTest(arr1, size);
+	bool shouldSortStr	  = true;   
+	bool shouldReverseStr = true;  
+
+	if (shouldSortStr) {
+		TPquicksortStr tps;
+		tps.quicksortStr(arr2, 0, sizeStr - 1);
+	}
+	if (shouldReverseStr) {
+		std::reverse(arr2.begin(), arr2.end());
+	}
+	
+	std::vector<std::string> _arr2 = arr2;
+	auto sum1 = 0;
+	auto sum2 = 0;
+	int iter = 5;
+
+
+	for (int i = 0; i < iter; i++) {
+		arr2 = _arr2;
+		//sum1 += quicksortTestStr(arr2, sizeStr);
+	
+		arr2 = _arr2;
+		sum2 += threepivotQuicksortTestStr(arr2, sizeStr);
+	}
+	std::cout << "Avg1: " << sum1/iter << std::endl;
+	std::cout << "Avg2: " << sum2/iter << std::endl;
+
+	// Insertion Sort Threshold Test
+	threepivotQuicksortWithDifferentInsertionSortThresholdTest(arr1, size);
 
 	// String Sortings
 	int sizeStr = 20;

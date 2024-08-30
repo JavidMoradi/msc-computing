@@ -229,26 +229,6 @@ void TPquicksort::naive_mt_threePivotSort(std::vector<int>& A, int size, int k)
 		thread.join();
 
 	// merge arrays here through mergearrays()
-	/*int N = size;
-	begin = 0;
-	end = begin + 2 * subSize - 1;
-	int mid = begin + subSize - 1;
-
-	while (N > 1) {
-		for (int i = 0; i < std::floor(k / 2); i++) {
-			if (N == 2) {
-				mergeArrays(A, begin, mid, size - 1);
-				break;
-			}
-			mergeArrays(A, begin, mid, end);
-
-			begin = end + 1;
-			end = begin + 2 * subSize - 1;
-			mid = begin + subSize - 1;
-		}
-
-		N = std::floor(N / 2);
-	}*/
 	int n = size;
 	for (int sz = subSize; sz < n; sz *= 2) {
 		for (int start = 0; start < n - 1; start += 2 * sz) {
@@ -334,106 +314,6 @@ void TPquicksort::parallelKthPartition(std::vector<int>& seq, int last,
 	std::vector<int> bucket4;
 
 	int count1 = 0, count2 = 0, count3 = 0, count4 = 0;
-
-	//TPquicksort tp;
-	//int firstInd = 0;
-
-	//std::thread t1 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-	//	&count1, &count2, &count3, &count4, firstInd, kTh1]()
-	//	{
-	//		for (int i = 0; i <= kTh1; i++) {
-	//			int element = seq[i];
-
-	//			if (element <= split1) {
-	//				bucket1.push_back(element);
-	//				count1++;
-	//			}
-	//			else if (split1 < element && element <= split2) {
-	//				bucket2.push_back(element);
-	//				count2++;
-	//			}
-	//			else if (split2 < element && element <= split3) {
-	//				bucket3.push_back(element);
-	//				count3++;
-	//			}
-	//			else {
-	//				bucket4.push_back(element);
-	//				count4++;
-	//			}
-	//		}
-	//	});
-	//std::thread t2 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-	//	&count1, &count2, &count3, &count4, kTh1, kTh2]()
-	//	{
-	//		for (int i = kTh1 + 1; i <= kTh2; i++) {
-	//			int element = seq[i];
-
-	//			if (element <= split1) {
-	//				bucket1.push_back(element);
-	//				count1++;
-	//			}
-	//			else if (split1 < element && element <= split2) {
-	//				bucket2.push_back(element);
-	//				count2++;
-	//			}
-	//			else if (split2 < element && element <= split3) {
-	//				bucket3.push_back(element);
-	//				count3++;
-	//			}
-	//			else {
-	//				bucket4.push_back(element);
-	//				count4++;
-	//			}
-	//		}
-	//	});
-	//std::thread t3 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-	//	&count1, &count2, &count3, &count4, kTh2, kTh3]()
-	//	{
-	//		for (int i = kTh2 + 1; i <= kTh3; i++) {
-	//			int element = seq[i];
-
-	//			if (element <= split1) {
-	//				bucket1.push_back(element);
-	//				count1++;
-	//			}
-	//			else if (split1 < element && element <= split2) {
-	//				bucket2.push_back(element);
-	//				count2++;
-	//			}
-	//			else if (split2 < element && element <= split3) {
-	//				bucket3.push_back(element);
-	//				count3++;
-	//			}
-	//			else {
-	//				bucket4.push_back(element);
-	//				count4++;
-	//			}
-	//		}
-	//	});
-	//std::thread t4 = std::thread([&seq, &bucket1, &bucket2, &bucket3, &bucket4, split1, split2, split3,
-	//	&count1, &count2, &count3, &count4, kTh3, last]()
-	//	{
-	//		for (int i = kTh3 + 1; i <= last; i++) {
-	//			int element = seq[i];
-
-	//			if (element <= split1) {
-	//				bucket1.push_back(element);
-	//				count1++;
-	//			}
-	//			else if (split1 < element && element <= split2) {
-	//				bucket2.push_back(element);
-	//				count2++;
-	//			}
-	//			else if (split2 < element && element <= split3) {
-	//				bucket3.push_back(element);
-	//				count3++;
-	//			}
-	//			else {
-	//				bucket4.push_back(element);
-	//				count4++;
-	//			}
-	//		}
-	//	});
 
 	auto partition = [&](int start, int end) {
 		for (int i = start; i <= end; i++) {
@@ -725,4 +605,412 @@ void TPquicksort::threePivotSortAltPvt(std::vector<int>& A, int left, int right)
 	threePivotSortAltPvt(A, a + 1, b - 1);
 	threePivotSortAltPvt(A, b + 1, d - 1);
 	threePivotSortAltPvt(A, d + 1, right);
+}
+
+void TPquicksort::threePivotSortWithCacheHeap(std::vector<int>& A, int left, int right)
+{
+	int size = right - left + 1;
+	if (size < INSERTION_SORT_THRESHOLD) {
+		if (size > 1)
+			insertionSort(A, left, right);
+		return;
+	}
+
+	int mid = (right + left) / 2;
+
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+	if (A[mid] > A[right])
+		std::swap(A[mid], A[right]);
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+
+	int p = A[left];
+	int q = A[mid];
+	int r = A[right];
+
+	std::swap(A[left + 1], A[mid]);
+
+	auto cache = std::make_unique<Cache>();
+	cache->a = left + 2;
+	cache->b = left + 2;
+	cache->c = right - 1;
+	cache->d = right - 1;
+
+	while (cache->b <= cache->c)
+	{
+		while (A[cache->b] < q && cache->b <= cache->c)
+		{
+			if (A[cache->b] < p)
+			{
+				std::swap(A[cache->a], A[cache->b]);
+				cache->a++;
+			}
+			cache->b++;
+		}
+		while (A[cache->c] > q && cache->b <= cache->c)
+		{
+			if (A[cache->c] > r)
+			{
+				std::swap(A[cache->c], A[cache->d]);
+				cache->d--;
+			}
+			cache->c--;
+		}
+		if (cache->b <= cache->c)
+		{
+			if (A[cache->b] > r)
+			{
+				if (A[cache->c] < p)
+				{
+					std::swap(A[cache->b], A[cache->a]);
+					std::swap(A[cache->a], A[cache->c]);
+					cache->a++;
+				}
+				else
+				{
+					std::swap(A[cache->b], A[cache->c]);
+				}
+				std::swap(A[cache->c], A[cache->d]);
+				cache->b++;
+				cache->c--;
+				cache->d--;
+			}
+			else
+			{
+				if (A[cache->c] < p)
+				{
+					std::swap(A[cache->b], A[cache->a]);
+					std::swap(A[cache->a], A[cache->c]);
+					cache->a++;
+				}
+				else
+				{
+					std::swap(A[cache->b], A[cache->c]);
+				}
+				cache->b++;
+				cache->c--;
+			}
+		}
+	}
+	cache->a--;
+	cache->b--;
+	cache->c++;
+	cache->d++;
+	std::swap(A[left + 1], A[cache->a]);
+	std::swap(A[cache->a], A[cache->b]);
+	cache->a--;
+	std::swap(A[left], A[cache->a]);
+	std::swap(A[right], A[cache->d]);
+
+	threePivotSortWithCacheHeap(A, left, cache->a - 1);
+	threePivotSortWithCacheHeap(A, cache->a + 1, cache->b - 1);
+	threePivotSortWithCacheHeap(A, cache->b + 1, cache->d - 1);
+	threePivotSortWithCacheHeap(A, cache->d + 1, right);
+}
+
+void TPquicksort::threePivotSortWithCacheArray(std::vector<int>& A, int left, int right)
+{
+	int size = right - left + 1;
+	if (size < INSERTION_SORT_THRESHOLD) {
+		if (size > 1)
+			insertionSort(A, left, right);
+		return;
+	}
+
+	int mid = (right + left) / 2;
+
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+	if (A[mid] > A[right])
+		std::swap(A[mid], A[right]);
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+
+	int p = A[left];
+	int q = A[mid];
+	int r = A[right];
+
+	std::swap(A[left + 1], A[mid]);
+
+	int cache[4] = {left + 2, left + 2, right - 1, right - 1};
+	int a = cache[0];
+	int b = cache[1];
+	int c = cache[2];
+	int d = cache[3];
+
+	while (b <= c)
+	{
+		while (A[b] < q && b <= c)
+		{
+			if (A[b] < p)
+			{
+				std::swap(A[a], A[b]);
+				a++;
+			}
+			b++;
+		}
+		while (A[c] > q && b <= c)
+		{
+			if (A[c] > r)
+			{
+				std::swap(A[c], A[d]);
+				d--;
+			}
+			c--;
+		}
+		if (b <= c)
+		{
+			if (A[b] > r)
+			{
+				if (A[c] < p)
+				{
+					std::swap(A[b], A[a]);
+					std::swap(A[a], A[c]);
+					a++;
+				}
+				else
+				{
+					std::swap(A[b], A[c]);
+				}
+				std::swap(A[c], A[d]);
+				b++;
+				c--;
+				d--;
+			}
+			else
+			{
+				if (A[c] < p)
+				{
+					std::swap(A[b], A[a]);
+					std::swap(A[a], A[c]);
+					a++;
+				}
+				else
+				{
+					std::swap(A[b], A[c]);
+				}
+				b++;
+				c--;
+			}
+		}
+	}
+	a--;
+	b--;
+	c++;
+	d++;
+	std::swap(A[left + 1], A[a]);
+	std::swap(A[a], A[b]);
+	a--;
+	std::swap(A[left], A[a]);
+	std::swap(A[right], A[d]);
+
+	threePivotSortWithCacheArray(A, left, a - 1);
+	threePivotSortWithCacheArray(A, a + 1, b - 1);
+	threePivotSortWithCacheArray(A, b + 1, d - 1);
+	threePivotSortWithCacheArray(A, d + 1, right);
+}
+
+void TPquicksort::threePivotSortWithCacheArrayHeap(std::vector<int>& A, int left, int right)
+{
+	int size = right - left + 1;
+	if (size < INSERTION_SORT_THRESHOLD) {
+		if (size > 1)
+			insertionSort(A, left, right);
+		return;
+	}
+
+	int mid = (right + left) / 2;
+
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+	if (A[mid] > A[right])
+		std::swap(A[mid], A[right]);
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+
+	int p = A[left];
+	int q = A[mid];
+	int r = A[right];
+
+	std::swap(A[left + 1], A[mid]);
+
+	std::vector<int> cache = { left + 2, left + 2, right - 1, right - 1 };
+
+	int a = cache[0];
+	int b = cache[1];
+	int c = cache[2];
+	int d = cache[3];
+
+	while (b <= c)
+	{
+		while (A[b] < q && b <= c)
+		{
+			if (A[b] < p)
+			{
+				std::swap(A[a], A[b]);
+				a++;
+			}
+			b++;
+		}
+		while (A[c] > q && b <= c)
+		{
+			if (A[c] > r)
+			{
+				std::swap(A[c], A[d]);
+				d--;
+			}
+			c--;
+		}
+		if (b <= c)
+		{
+			if (A[b] > r)
+			{
+				if (A[c] < p)
+				{
+					std::swap(A[b], A[a]);
+					std::swap(A[a], A[c]);
+					a++;
+				}
+				else
+				{
+					std::swap(A[b], A[c]);
+				}
+				std::swap(A[c], A[d]);
+				b++;
+				c--;
+				d--;
+			}
+			else
+			{
+				if (A[c] < p)
+				{
+					std::swap(A[b], A[a]);
+					std::swap(A[a], A[c]);
+					a++;
+				}
+				else
+				{
+					std::swap(A[b], A[c]);
+				}
+				b++;
+				c--;
+			}
+		}
+	}
+	a--;
+	b--;
+	c++;
+	d++;
+	std::swap(A[left + 1], A[a]);
+	std::swap(A[a], A[b]);
+	a--;
+	std::swap(A[left], A[a]);
+	std::swap(A[right], A[d]);
+
+	threePivotSortWithCacheArrayHeap(A, left, a - 1);
+	threePivotSortWithCacheArrayHeap(A, a + 1, b - 1);
+	threePivotSortWithCacheArrayHeap(A, b + 1, d - 1);
+	threePivotSortWithCacheArrayHeap(A, d + 1, right);
+}
+
+void TPquicksort::threePivotSort(std::vector<int>& A, int left, int right, int insertionSortThreshold)
+{
+	int size = right - left + 1;
+	if (size < insertionSortThreshold) {
+		if (size > 1)
+			insertionSort(A, left, right);
+		return;
+	}
+
+	int mid = (right + left) / 2;
+
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+	if (A[mid] > A[right])
+		std::swap(A[mid], A[right]);
+	if (A[left] > A[mid])
+		std::swap(A[left], A[mid]);
+
+	int p = A[left];
+	int q = A[mid];
+	int r = A[right];
+
+	std::swap(A[left + 1], A[mid]);
+
+	int a = left + 2;
+	int b = left + 2;
+	int c = right - 1;
+	int d = right - 1;
+
+	while (b <= c)
+	{
+		while (A[b] < q && b <= c)
+		{
+			if (A[b] < p)
+			{
+				std::swap(A[a], A[b]);
+				a++;
+			}
+			b++;
+		}
+		while (A[c] > q && b <= c)
+		{
+			if (A[c] > r)
+			{
+				std::swap(A[c], A[d]);
+				d--;
+			}
+			c--;
+		}
+		if (b <= c)
+		{
+			if (A[b] > r)
+			{
+				if (A[c] < p)
+				{
+					std::swap(A[b], A[a]);
+					std::swap(A[a], A[c]);
+					a++;
+				}
+				else
+				{
+					std::swap(A[b], A[c]);
+				}
+				std::swap(A[c], A[d]);
+				b++;
+				c--;
+				d--;
+			}
+			else
+			{
+				if (A[c] < p)
+				{
+					std::swap(A[b], A[a]);
+					std::swap(A[a], A[c]);
+					a++;
+				}
+				else
+				{
+					std::swap(A[b], A[c]);
+				}
+				b++;
+				c--;
+			}
+		}
+	}
+	a--;
+	b--;
+	c++;
+	d++;
+	std::swap(A[left + 1], A[a]);
+	std::swap(A[a], A[b]);
+	a--;
+	std::swap(A[left], A[a]);
+	std::swap(A[right], A[d]);
+
+	threePivotSort(A, left, a - 1, insertionSortThreshold);
+	threePivotSort(A, a + 1, b - 1, insertionSortThreshold);
+	threePivotSort(A, b + 1, d - 1, insertionSortThreshold);
+	threePivotSort(A, d + 1, right, insertionSortThreshold);
 }
